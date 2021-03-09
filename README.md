@@ -1,127 +1,80 @@
-# Pdf Viewer Plugin
+# flutter_plugin_pdf_viewer
 
-[![pub package](https://img.shields.io/pub/v/pdf_viewer_plugin.svg)](https://pub.dartlang.org/packages/pdf_viewer_plugin)
-
-A Flutter plugin for IOS and Android providing a simple way to display PDFs.
-
-## Features:
-
-* Display PDF.
-
-![android](assets/gifs/pdf_viewer_plugin_android.gif) ........... ![ios](assets/gifs/pdf_viewer_plugin_ios.gif)
+A flutter plugin for handling PDF files. Works on both Android & iOS
 
 ## Installation
 
-First, add `pdf_viewer_plugin` as a [dependency in your pubspec.yaml file](https://flutter.io/using-packages/).
-
-### iOS
-
-Add one row to the `ios/Runner/info.plist`:
-
+Add  *flutter_plugin_pdf_viewer*  as a dependency in [your pubspec.yaml file](https://flutter.io/platform-plugins/).
 ```
-...
-
-<key>io.flutter.embedded_views_preview</key>
-<true/>
+flutter_plugin_pdf_viewer: any
 ```
 
-You need to 
+---
 
-### Example
+## Android
+No permissions required. Uses application cache directory.
 
-Here is an example flutter app.
+## iOS
+No permissions required.
 
-```dart
-import 'dart:async';
-import 'dart:io';
-import 'dart:typed_data';
+## How-to:
 
-import 'package:flutter/material.dart';
-import 'package:pdf_viewer_plugin/pdf_viewer_plugin.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:http/http.dart' as http;
+#### Load PDF
+```
+// Load from assets
+PDFDocument doc = await PDFDocument.fromAsset('assets/test.pdf');
+ 
+// Load from URL
+PDFDocument doc = await PDFDocument.fromURL('http://www.africau.edu/images/default/sample.pdf');
 
-void main() => runApp(MyApp());
+// Load from file
+File file  = File('...');
+PDFDocument doc = await PDFDocument.fromFile(file);
+```
 
-class MyApp extends StatefulWidget {
-  @override
-  _MyAppState createState() => _MyAppState();
-}
+#### Load pages
+```
+// Load specific page
+PDFPage pageOne = await doc.get(page: _number);
+```
 
-class _MyAppState extends State<MyApp> {
-  String path;
-
-  @override
-  initState() {
-    super.initState();
-  }
-
-  Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
-
-    return directory.path;
-  }
-
-  Future<File> get _localFile async {
-    final path = await _localPath;
-    return File('$path/teste.pdf');
-  }
-
-  Future<File> writeCounter(Uint8List stream) async {
-    final file = await _localFile;
-
-    // Write the file
-    return file.writeAsBytes(stream);
-  }
-
-  Future<Uint8List> fetchPost() async {
-    final response = await http.get(
-        'https://expoforest.com.br/wp-content/uploads/2017/05/exemplo.pdf');
-    final responseJson = response.bodyBytes;
-
-    return responseJson;
-  }
-
-  loadPdf() async {
-    writeCounter(await fetchPost());
-    path = (await _localFile).path;
-
-    if (!mounted) return;
-
-    setState(() {});
-  }
-
-  @override
+#### Pre-built viewer
+Use the pre-built PDF Viewer
+```
+@override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
+    Scaffold(
         appBar: AppBar(
-          title: Text('Plugin example app'),
+          title: Text('Example'),
         ),
         body: Center(
-          child: Column(
-            children: <Widget>[
-              if (path != null)
-                Container(
-                  height: 300.0,
-                  child: PdfViewer(
-                    filePath: path,
-                  ),
-                )
-              else
-                Text("Pdf is not Loaded"),
-              RaisedButton(
-                child: Text("Load pdf"),
-                onPressed: loadPdf,
-              ),
-            ],
-          ),
-        ),
-      ),
+        child: _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : PDFViewer(document: document)),
     );
   }
-}
 ```
 
-[Feedback welcome](https://github.com/lubritto/Pdf_Viewer_Plugin/issues) and
-[Pull Requests](https://github.com/lubritto/Pdf_Viewer_Plugin/pulls) are most welcome!
+This code produces the following view:
+
+<img height="500px" src="https://raw.githubusercontent.com/CrossPT/flutter_pdf_viewer/master/demo.png" alt="Demo Screenshot 1"/>
+
+---
+
+## TODO
+
+* Allow password-protected files
+* ~~Refactor PDFDocument.getAll() method~~
+* ~~Increase page resolution~~
+* Add swipe to change page
+
+---
+
+#### Third-party packages used
+
+| Name | Description  |
+|-|-|
+| [path_provider](https://pub.dartlang.org/packages/path_provider)               | A Flutter plugin for finding commonly used locations on the filesystem. Supports iOS and Android.            |
+| [flutter_cache_manager](https://pub.dartlang.org/packages/flutter_cache_manager)       | A CacheManager to download and cache files in the cache directory of the app. Various settings on how long to keep a file can be changed. |
+| [numberpicker](https://pub.dartlang.org/packages/numberpicker)                | NumberPicker is a custom widget designed for choosing an integer or decimal number by scrolling spinners. |
+| [flutter_advanced_networkimage](https://pub.dartlang.org/packages/flutter_advanced_networkimage) | An advanced image provider provides caching and retrying for flutter app. Now with zoomable widget and transition to image widget. |

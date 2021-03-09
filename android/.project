@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>pdf_viewer_plugin</name>
-	<comment>Project pdf_viewer_plugin created by Buildship.</comment>
+	<name>flutter_plugin_pdf_viewer</name>
+	<comment>Project android created by Buildship.</comment>
 	<projects>
 	</projects>
 	<buildSpec>
